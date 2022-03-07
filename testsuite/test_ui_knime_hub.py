@@ -10,17 +10,17 @@ import time
 from selenium.common.exceptions import TimeoutException
 
 # TODO: parallel excecution?!?!?
-#@pytest.mark.skip("reason=currently we dont want to test this")
+@pytest.mark.skip("reason=currently we dont want to test this")
 @scenario("features/ui_knime_hub.feature","Accessing spaces and UI verification")
 def test_ui_verification():
     pass
 
-#@pytest.mark.skip("reason=currently we dont want to test this")
+@pytest.mark.skip("reason=currently we dont want to test this")
 @scenario("features/ui_knime_hub.feature","Creating a new public space")
 def test_creating_space():
     pass
 
-#@pytest.mark.skip("reason=currently we dont want to test this")
+@pytest.mark.skip("reason=currently we dont want to test this")
 @scenario("features/ui_knime_hub.feature","Deleting a space")
 def test_deleting_space():
     pass
@@ -43,12 +43,11 @@ url_knime_login = 'https://www.knime.com/user/login?destination=/'
 
 #TODO executable path is different if run on windows not mac
 
-chrome_driver = webdriver.Chrome(service = Service(test_location))
 
 
 @given("logged in user with <username> and <password> viewing their spaces")
 def login(username,password):
-
+	chrome_driver = webdriver.Chrome(service=Service(test_location))
 	chrome_driver.get(url_knime_login)
 	chrome_driver.maximize_window()
 	button_cookie_accept = chrome_driver.find_element(By.XPATH, '/html/body/div[2]/div/div/div/div[2]/button[1]')
@@ -96,6 +95,7 @@ def user_spaces_page():
 
 @when("user creates a new public space with <spacename>")
 def create_space(spacename):
+	chrome_driver = webdriver.Chrome(service=Service(test_location))
 	wait = WebDriverWait(chrome_driver, 10)
 	chrome_driver.implicitly_wait(3)
 	#wait.until(EC.visibility_of((By.XPATH, '//*[@id="__layout"]/div/div[1]/main/section/div/div[2]/div/div/ul/li[9]/div/div/button[2]')))
@@ -119,6 +119,7 @@ def create_space(spacename):
 	# negativ testcase - name field is empty
 @when("user deletes the choosen space with <spacename>")
 def delete_space(spacename):
+	chrome_driver = webdriver.Chrome(service=Service(test_location))
 	# on spaces click on the space you wish to delete
 	button_space_list = chrome_driver.find_element(By.CLASS_NAME, 'title')
 	print(button_space_list)

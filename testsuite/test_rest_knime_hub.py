@@ -1,9 +1,12 @@
 import pytest
 from pytest_bdd import given,when,then,scenario, parsers
 import requests as REST
-from requests.structures import CaseInsensitiveDict
+import json
+from conftest import token, user_rep_space_names, user, user_for_url
 
-url_create_space ='https://api.hub.knime.com/repository/Users/test_knime_001/'
+
+
+url_create_space =f'https://api.hub.knime.com/repository//Users/{user_for_url}/'
 url_api ='https://api.hub.knime.com/'
 
 #@pytest.mark.skip("reason=currently we dont want to test this")
@@ -16,107 +19,75 @@ def test_create_space():
 def test_delete_space():
     pass
 
-body ={
-
-    "private":"false",
-    "type":"Space",
-    "overwrite": "false",
-    "move": "true",
-    "from-repository": ""
-
-}
-
-
-"""
-
-AUTH
-Bearer Token
-"eyJhbGciOiJSUzI1NiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICJ2SHpuYUhTS3RMWmszcnczVlJBN2M4eThsUHlVazU3YndMejRvekFZT1o4In0.eyJqdGkiOiJkYzViNmE4Ny0zZDY4LTQ4ZDQtYTFhYi04YmI4ZTZmYmIzNjMiLCJleHAiOjE2NDYxOTA4NzcsIm5iZiI6MCwiaWF0IjoxNjQ2MTgwMDc3LCJpc3MiOiJodHRwczovL2F1dGguaHViLmtuaW1lLmNvbS9hdXRoL3JlYWxtcy9rbmltZSIsInN1YiI6IjBlY2UwMmY1LWFkZmItNDU3Yi1hMmFmLWJjOTNkYjc0NDdjMCIsInR5cCI6IkJlYXJlciIsImF6cCI6Imh1Yi11aSIsIm5vbmNlIjoib0JGUVJ0c2xUallyektQektoS200M3BwYmF6NWRpRjJIaGU1TV9qNUFmWSIsImF1dGhfdGltZSI6MTY0NjE4MDA3Niwic2Vzc2lvbl9zdGF0ZSI6ImI5ZWJmMTg5LWVhMDctNGYzYi04MmQxLThiMDVlNDI1ZWEwNiIsImFjciI6IjEiLCJhbGxvd2VkLW9yaWdpbnMiOlsiaHR0cHM6Ly9zdGFnZS5odWIua25pbWUuY29tIiwiaHR0cHM6Ly9odWIua25pbWUuY29tIl0sInJlc291cmNlX2FjY2VzcyI6eyJicm9rZXIiOnsicm9sZXMiOlsicmVhZC10b2tlbiJdfSwiYWNjb3VudCI6eyJyb2xlcyI6WyJtYW5hZ2UtYWNjb3VudCIsIm1hbmFnZS1hY2NvdW50LWxpbmtzIiwidmlldy1wcm9maWxlIl19fSwic2NvcGUiOiJvcGVuaWQgZ3JvdXBzIHJvbGVzIGVtYWlsIHByb2ZpbGUiLCJlbWFpbF92ZXJpZmllZCI6dHJ1ZSwibmFtZSI6IlRlc3RfS25pbWVfMDAxIiwiZ3JvdXBzIjpbImh1YnVzZXIiXSwicHJlZmVycmVkX3VzZXJuYW1lIjoidGVzdF9rbmltZV8wMDEiLCJnaXZlbl9uYW1lIjoiVGVzdF9LbmltZV8wMDEiLCJlbWFpbCI6ImRvci5kZWthbnlAZ21haWwuY29tIn0.PAvqhc0SxdWb-yU16KBEHAd1m5WMuG5U7gFVIufEZD1hE7fnKFkSbPz8f180q92QE9FfEgMRjDE32dQ45aOP2dEKNW_QNbsDO--MRFFm7Lm4S7HBn1V32aVIRT7ZvL8ywiu3gKAZDEMJq8gHysSSSpjGLYAGB6Yrw9cFZ9eFZ5jwSRncHtRMZid7Ybg42kgR4MhPMGpmd87PFbA_5MlglgwjoT8_2nGf5eBygbDIr4T4EtmbWXO_i_CjmQbKz3W9wQQCOIsCsCx-N0TkkB28fYqPeAUxVscliXGFMkYrA5R_jZ6c2nnKwCYqTdHOCKkOJw9FMxBJelmFaC0JcwXMIg"
-
-GET
-https://api.hub.knime.com/repository/Users/test_knime_001/
-
-
-
-PUT https://api.hub.knime.com/repository/Users/test_knime_001/New space
-
-Body
-
-{"private":false,"type":"Space"}
-
-
-PUT 
-https://api.hub.knime.com/repository//Users/test_knime_001/---test-003
-Body
-{
-    "private":false,
-    "type":"Space", 
-    "overwrite": false,
-    "move": true,
-    "from-repository": "/Users/test_knime_001/New space"
-}
-
-
-DELETE
-https://api.hub.knime.com/repository//Users/test_knime_001/---test-003
-
-
-
-"""
-
-
 
 @given("request with body and <spacename> which is a <test_type> test")
-def arrange_requirements(spacename, test_type):
-    print(f"\nThe name of the space is :{spacename}")
+def arrange_requirements(spacename, test_type, user):
+    print(f"\nCreate a public space with name :{spacename}")
     print(f"This is a {test_type} test.")
+    print(user_rep_space_names(user))
+    if spacename in user_rep_space_names(user):
+        print(f"WARNING: The {spacename} that you're trying to create is already in use!")
+        #raise Exception
+    else:
+        print(f"The {spacename} is not used.")
 
-token = {"eyJhbGciOiJSUzI1NiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICJ2SHpuYUhTS3RMWmszcnczVlJBN2M4eThsUHlVazU3YndMejRvekFZT1o4In0"
 
-}
+
+
 
 @given("an existing space with name <spacename> which is a <test_type> test")
-def arrange_requirements(spacename, test_type):
+def arrange_requirements(spacename, test_type,user):
     print(f"\nThe name of the space which we try to delete is :{spacename}")
     print(f"This is a {test_type} test.")
+    print(user_rep_space_names(user))
+    if spacename not in user_rep_space_names(user):
+        print(f"WARNING: The {spacename} what you're trying to delete is not existing!")
+        #raise Exception
+    else:
+        print(f"The {spacename} exist, so it can be deleted.")
+
+
 
 @when("put request arrives to endpoint/<spacename>", target_fixture = "resp")
-def create_request(spacename, body):
-    headers = CaseInsensitiveDict()
-    headers["Accept"] = "application/json"
-    headers["Authorization"] = f"Bearer {token}"
-    resp = REST.get(url_create_space, headers=headers)
-    print(resp.status_code)
+def create_request(spacename, user):
+    body = {
+        "private":"false" ,
+        "type": "Space",
+        "overwrite": "false",
+        "move": "true",
+        "from-repository": ""}
+
+    headers = {"Accept":"application/json", "Authorization":f"Bearer {token}"}
     url_create_space_filled = url_create_space + spacename
-    print("Sending a DELETE request to this url:",url_create_space_filled)
-    body["from-repository"] = f"/Users/test_knime_001/{spacename}"
-    print("with body :",body)
-    resp = REST.put(url_create_space, data =body )
-    print("The response is :", resp)
+    print("Sending a PUT request to this url:",url_create_space_filled)
+    body["from-repository"] = f"/Users/{user}/New space"
+    print(f'with body :{body} and header: {headers}')
+    resp = REST.put(url_create_space_filled, data = json.dumps(body, indent =2) , headers=headers)
+    print("The response is :", resp.text)
     return resp
 
 
 
 @when("delete request arrives to endpoint", target_fixture = "resp")
 def delete_request(spacename):
-    url_create_space_filled = url_create_space + spacename
-    headers = CaseInsensitiveDict()
-    headers["Accept"] = "application/json"
-    headers["Authorization"] = f"Bearer {token}"
-    resp = REST.get(url_create_space, headers=headers)
-    print(resp.status_code)
-
+    url_create_space_filled = url_create_space + spacename + '/'
+    headers = {"Accept":"application/json", "Authorization":f"Bearer {token}"}
     print("Sending a DELETE request to this url:",url_create_space_filled)
-#    body["from-repository"] = f"/Users/test_knime_001/{spacename}"
-    resp = REST.put(url_create_space)
-    print("The response is :", resp)
+    print(f"with header: {headers}")
+    resp = REST.delete(url_create_space_filled, headers=headers)
+    print("The response is :", resp.text)
     return resp
 
 
 @then("<expected_status> is responded")
 def check_response(resp, expected_status):
     print("The response code is:",resp.status_code, "| and the expected status is:",expected_status )
-    assert int(expected_status) == resp.status_code
+    if resp.status_code == 200:
+        print("It's possible that you're trying to create a space with a name that is already in use.")
+
+    assert int(expected_status) == int(resp.status_code)
+    if resp.status_code == 200:
+        print("It's possible that you're trying to create a space with a name that is already in use.")
 
 
 #@then("in the response is a uniq Id for the space", target_fixture= "id")
