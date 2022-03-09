@@ -39,7 +39,6 @@ def arrange_requirements(spacename, test_type, user):
 def arrange_requirements(spacename, test_type,user):
     print(f"\nThe name of the space which we try to delete is :{spacename}")
     print(f"This is a {test_type} test.")
-    #print(user_rep_space_names(user))
     if spacename not in user_rep_space_names(user):
         print(f"WARNING: The {spacename} what you're trying to delete is not existing!")
         #raise Exception
@@ -88,10 +87,6 @@ def check_response(resp, expected_status):
 
 
 
-#@then("in the response is a uniq Id for the space", target_fixture= "id")
-#def get_blobId(resp):
-#    response_id = resp['id']
-#    print(f"In the response : {response_id} is found.")
 
 
 

@@ -14,7 +14,7 @@ from conftest import user_for_url, user_rep_space_names, chrome_driver
 #TODO: Missing validations
 #TODO: make it gherkin-BDD style
 #TODO executable path is different if run on windows not mac
-test_location = '/Users/mormika/Downloads/chromedriver'
+
 url_knime = "https://www.knime.com/"
 url_knime_login = 'https://www.knime.com/user/login?destination=/'
 
@@ -148,9 +148,20 @@ button_delete_space.click()
 #confirm that you wanna delete it
 field_delete_space = wait.until(EC.presence_of_element_located((By.XPATH, '//*[@id="confirmationForm"]/div/input')))
 field_delete_space.send_keys(spacename_to_delete)
-button_delete_space_confirm = wait.until(EC.element_to_be_clickable((By.XPATH, '//button[contains(text(), "I understand the consequences, delete space permanently")]')) )
+time.sleep(3)
+
+try:
+	button_delete_space_confirm = wait.until(EC.element_to_be_clickable((By.XPATH,'//button[contains(text(), "I understand the consequences, delete space permanently")]')))
+
+except:
+	print("Space was not deleted")
+
+
 button_delete_space_confirm.click()
 print(f"User succcessfuly deleted : {spacename_to_delete}")
+
+time.sleep(2)
+chrome_driver.implicitly_wait(3)
 chrome_driver.close()
 
 
