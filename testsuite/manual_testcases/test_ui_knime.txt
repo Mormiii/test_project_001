@@ -1,4 +1,0 @@
-Manual testcases for the UI testing of Knime Hub.
-
-1. Login
-

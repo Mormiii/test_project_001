@@ -24,8 +24,8 @@ def test_delete_space():
 def arrange_requirements(spacename, test_type, user):
     print(f"\nCreate a public space with name :{spacename}")
     print(f"This is a {test_type} test.")
-    print(user_rep_space_names(user))
-    if spacename in user_rep_space_names(user):
+    spacenames= user_rep_space_names(user)
+    if spacename in spacenames:
         print(f"WARNING: The {spacename} that you're trying to create is already in use!")
         #raise Exception
     else:
@@ -39,7 +39,7 @@ def arrange_requirements(spacename, test_type, user):
 def arrange_requirements(spacename, test_type,user):
     print(f"\nThe name of the space which we try to delete is :{spacename}")
     print(f"This is a {test_type} test.")
-    print(user_rep_space_names(user))
+    #print(user_rep_space_names(user))
     if spacename not in user_rep_space_names(user):
         print(f"WARNING: The {spacename} what you're trying to delete is not existing!")
         #raise Exception
@@ -84,10 +84,8 @@ def check_response(resp, expected_status):
     print("The response code is:",resp.status_code, "| and the expected status is:",expected_status )
     if resp.status_code == 200:
         print("It's possible that you're trying to create a space with a name that is already in use.")
-
     assert int(expected_status) == int(resp.status_code)
-    if resp.status_code == 200:
-        print("It's possible that you're trying to create a space with a name that is already in use.")
+
 
 
 #@then("in the response is a uniq Id for the space", target_fixture= "id")

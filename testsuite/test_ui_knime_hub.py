@@ -8,46 +8,32 @@ from selenium.common.exceptions import NoSuchElementException
 from selenium.webdriver.support.ui import WebDriverWait
 import time
 from selenium.common.exceptions import TimeoutException
-
-# TODO: parallel excecution?!?!?
-@pytest.mark.skip("reason=currently we dont want to test this")
-@scenario("features/ui_knime_hub.feature","Accessing spaces and UI verification")
-def test_ui_verification():
-    pass
-
-@pytest.mark.skip("reason=currently we dont want to test this")
-@scenario("features/ui_knime_hub.feature","Creating a new public space")
-def test_creating_space():
-    pass
-
-@pytest.mark.skip("reason=currently we dont want to test this")
-@scenario("features/ui_knime_hub.feature","Deleting a space")
-def test_deleting_space():
-    pass
+from conftest import user_for_url, user_rep_space_names, chrome_driver
 
 
-
-
-global test_location
-
+#TODO: Missing validations
+#TODO: make it gherkin-BDD style
+#TODO executable path is different if run on windows not mac
 test_location = '/Users/mormika/Downloads/chromedriver'
-test_location_old= '/Applications/Google Chrome.app/Contents/MacOS/chromedriver'
-
-# in case of installing the ChromeDriver
-#from webdriver_manager.chrome import ChromeDriverManager
-#driver = webdriver.Chrome(service=Service(ChromeDriverManager().install())
-
 url_knime = "https://www.knime.com/"
 url_knime_login = 'https://www.knime.com/user/login?destination=/'
 
+class User():
+	def __init__(self, username, password):
+		self.username = username
+		self.password = password
 
-#TODO executable path is different if run on windows not mac
+"""
+Test data
+"""
+knime_user = User('Test_Knime_001', 'Jelszo')
+spacename = "macska6"
 
 
-
-@given("logged in user with <username> and <password> viewing their spaces")
-def login(username,password):
-	chrome_driver = webdriver.Chrome(service=Service(test_location))
+"""
+Login and navigating to User's space
+"""
+def login():
 	chrome_driver.get(url_knime_login)
 	chrome_driver.maximize_window()
 	button_cookie_accept = chrome_driver.find_element(By.XPATH, '/html/body/div[2]/div/div/div/div[2]/button[1]')
@@ -56,9 +42,10 @@ def login(username,password):
 	field_user_pw = chrome_driver.find_element(By.ID, 'edit-pass')
 	button_sign_in = chrome_driver.find_element(By.ID, 'edit-submit')
 
-	#filling sign in fields and clicking
-	field_user_name.send_keys(f"{username}")
-	field_user_pw.send_keys(f"{password}")
+	print("filling sign in fields and clicking")
+
+	field_user_name.send_keys(knime_user.username)
+	field_user_pw.send_keys(knime_user.password)
 	button_sign_in.click()
 
 	chrome_driver.implicitly_wait(2)
@@ -66,95 +53,117 @@ def login(username,password):
 	# go to hub
 	button_hub = chrome_driver.find_element(By.XPATH, '/html/body/div[1]/header/div/div/nav[1]/ul/li[1]/a')
 	button_hub.click()
-
 	chrome_driver.implicitly_wait(3)
 	wait = WebDriverWait(chrome_driver, 5)
-	#button_cookie_accept_2 = chrome_driver.find_element(By.CLASS_NAME, "accept-button button primary")
-	#button_cookie_accept_2 = chrome_driver.find_element(By.CSS_SELECTOR, "#__layout > div > div.container.cookie-modal.modal.info > div.wrapper > div > div.controls > button")
-	wait.until(EC.element_to_be_clickable((By.CSS_SELECTOR, "#__layout > div > div.container.cookie-modal.modal.info > div.wrapper > div > div.controls > button"))).click()
+	wait.until(EC.element_to_be_clickable((By.CSS_SELECTOR,"#__layout > div > div.container.cookie-modal.modal.info > div.wrapper > div > div.controls > button"))).click()
 	print("Found AND CLICKED the cookie element")
-	# sign in again ?! errror?
+	# need to click on sign in again - not the smoothest
 
 	button_sign_in_2 = wait.until(EC.element_to_be_clickable((By.XPATH, '//*[@id="__layout"]/div/div[1]/header/nav/div[2]/button')))
 	button_sign_in_2.click()
 
 	# go to spaces
-	button_user_navigation = chrome_driver.find_element(By.XPATH, '/html/body/div/div/div/div[1]/header/nav/div[2]/div/button/div')
+	button_user_navigation = chrome_driver.find_element(By.XPATH,'/html/body/div/div/div/div[1]/header/nav/div[2]/div/button/div')
 	button_user_navigation.click()
 
-	button_spaces = chrome_driver.find_element(By.XPATH, "/html/body/div/div/div/div[1]/header/nav/div[2]/div/ul/li[2]/a")
+	button_spaces = chrome_driver.find_element(By.XPATH,"/html/body/div/div/div/div[1]/header/nav/div[2]/div/ul/li[2]/a")
 	button_spaces.click()
 
-# create new space
-#chrome_driver.implicitly_wait(2)
-#chrome_driver.execute_script("window.scrollTo(0,document.body.scrollHeight)")
 
-@when("page is fully loaded")
-def user_spaces_page():
-	pass
 
-@when("user creates a new public space with <spacename>")
-def create_space(spacename):
-	chrome_driver = webdriver.Chrome(service=Service(test_location))
-	wait = WebDriverWait(chrome_driver, 10)
-	chrome_driver.implicitly_wait(3)
-	#wait.until(EC.visibility_of((By.XPATH, '//*[@id="__layout"]/div/div[1]/main/section/div/div[2]/div/div/ul/li[9]/div/div/button[2]')))
+
+"""
+Creating a space
+"""
+login()
+wait = WebDriverWait(chrome_driver, 10)
+time.sleep(3)
+chrome_driver.implicitly_wait(2)
+print("trying to create a new space")
+spacenames = user_rep_space_names(user_for_url)
+count_spaces= len(spacenames)
+print(count_spaces)
+if count_spaces== 0:
+	print("Currently there are 0 spaces")
+	wait.until(EC.element_to_be_clickable((By.CSS_SELECTOR,'#__layout > div > div.sticky-footer > main > section > div > div.grid-item-9.child-container > div > div > ul > li > div > div > button:nth-child(2)'))).click()
+else:
 	try:
-		wait.until(EC.element_to_be_clickable((By.CSS_SELECTOR, '#__layout > div > div.sticky-footer > main > section > div > div.grid-item-9.child-container > div > div > ul > li:nth-child(10) > div > div > button:nth-child(2)'))).click()
+		count_spaces+=1
+		wait.until(EC.element_to_be_clickable((By.CSS_SELECTOR, f'#__layout > div > div.sticky-footer > main > section > div > div.grid-item-9.child-container > div > div > ul > li:nth-child({count_spaces}) > div > div > button:nth-child(2)'))).click()
+		print("locating Webelement for space creation was successful")
+
 	except TimeoutException:
-		wait.until(EC.element_to_be_clickable((By.XPATH, '//*[@id="__layout"]/div/div[1]/main/section/div/div[2]/div/div/ul/li[9]/div/div/button[2]'))).click()
-
-	new_space_name = 'Parampam1'
-
-	#WebDriverWait(chrome_driver, 20).until(EC.element_to_be_clickable((By.XPATH, "/html/body/div/div/div/div[1]/main/section[1]/div/div/div/div[1]/h3/div/div/textarea")))
-	print(f"Name of the new public space:{spacename}")
-	field_new_space = chrome_driver.find_element(By.XPATH, '//*[@id="__layout"]/div/div[1]/main/section[1]/div/div/div/div[1]/h3/div/div/textarea')
-	field_new_space.clear()
-
-	field_new_space.send_keys(new_space_name)
-
-	button_confirm_new_space_name = chrome_driver.find_element(By.XPATH, '/html/body/div/div/div/div[1]/main/section[1]/div/div/div/div[1]/h3/div/div/div/button[1]')
-	button_confirm_new_space_name.click()
-
-	# negativ testcase - name field is empty
-@when("user deletes the choosen space with <spacename>")
-def delete_space(spacename):
-	chrome_driver = webdriver.Chrome(service=Service(test_location))
-	# on spaces click on the space you wish to delete
-	button_space_list = chrome_driver.find_element(By.CLASS_NAME, 'title')
-	print(button_space_list)
-	chrome_driver.implicitly_wait(3)
-	button_space_details = chrome_driver.find_element(By.XPATH, '//*[ text() = {0} ]'.format(spacename))
-	button_space_details.click()
+		print("WebElement was not found! Inspect and correct the locator")
 
 
+print(f"Name of the new public space:{spacename}")
+if spacename in spacenames:
+    print(f"WARNING: The {spacename} that you're trying to create is already in use!")
+    raise Exception
+else:
+    print(f"The {spacename} is not used.")
 
-	wait = WebDriverWait(chrome_driver, 10)
-	button_new_space_more = chrome_driver.find_element(By.CSS_SELECTOR, '# __layout > div > div.sticky-footer > main > section.action-bar > div > div.grid-item-3.options > div:nth-child(2) > div:nth-child(3) > div > button > svg')
-	button_new_space_more.click()
+time.sleep(2)
+field_new_space = chrome_driver.find_element(By.XPATH, '//*[@id="__layout"]/div/div[1]/main/section[1]/div/div/div/div[1]/h3/div/div/textarea')
+field_new_space.clear()
+chrome_driver.implicitly_wait(2)
+field_new_space.send_keys(f"{spacename}")
+print("written in the name of the new space")
+button_confirm_new_space_name = chrome_driver.find_element(By.XPATH, '//button[@title="Save"]')
+button_confirm_new_space_name.click()
+print("New space has been created")
+time.sleep(2)
 
-	button_delete_space = chrome_driver.find_element(By.XPATH, '//*[@id="__layout"]/div/div[1]/main/section[2]/div/div[2]/div[2]/div[3]/div/div/div[1]/div/button')
-	button_delete_space.click()
+"""
+Deleting space
+"""
 
-	#confirm that you wanna delete it
-	field_delete_space = wait.until(EC.presence_of_element_located((By.XPATH, '//*[@id="confirmationForm"]/div/input')))
-	field_delete_space.send_keys(spacename)
-	button_delete_space_confirm = wait.until(EC.element_to_be_clickable((By.XPATH, '//*[@id="__layout"]/div/div[1]/main/section[2]/div/div[2]/div[2]/div[3]/div/div/div[1]/div[2]/div[2]/div/div[4]/button')) )
-	button_delete_space_confirm.click()
+chrome_driver.implicitly_wait(2)
+button_spaces = chrome_driver.find_element(By.XPATH, '//*[@id="__layout"]/div/div[1]/section/nav/ul/li[3]/a')
+button_spaces.click()
 
-@then("verifying elements on the page")
-def verify_ui():
-	pass
+spacename_to_delete = spacename
 
-@then("newly created space is visible under spaces")
-def verfiy_created_space():
-	pass
+print(f"Name of the public space you wish to delete:{spacename_to_delete}")
 
-@then("the deleted space is no longer visible in spaces")
-def verify_deleted_space():
-	pass
-## validation, no error
-#def no_error_message(browser):
-#	with pytest.raises(NoSuchElementException):
-#		browser.find_element(By.CSS_SELECTOR, 'message error')
+spacenames = user_rep_space_names(user_for_url)
+count_spaces= len(spacenames)
+if spacename_to_delete not in spacenames:
+    print(f"WARNING: The {spacename} that you're trying to delete is not existing!")
+    raise Exception
+else:
+    print(f"The {spacename_to_delete} can be deleted.")
+
+chrome_driver.implicitly_wait(3)
+
+button_space_to_delete = wait.until(EC.element_to_be_clickable(chrome_driver.find_element(By.XPATH, f'//h3[contains(text(), "{spacename_to_delete}")]'))).click()
+
+chrome_driver.maximize_window()
+wait = WebDriverWait(chrome_driver, 10)
+button_new_space_more = wait.until(EC.element_to_be_clickable(chrome_driver.find_element(By.XPATH,'//*[@id="__layout"]/div/div[1]/main/section[2]/div/div[2]/div[2]/div[3]/div/button'))).click()
+
+button_delete_space = chrome_driver.find_element(By.XPATH, '//button[contains(text(), "Delete space")]')
+button_delete_space.click()
+
+#confirm that you wanna delete it
+field_delete_space = wait.until(EC.presence_of_element_located((By.XPATH, '//*[@id="confirmationForm"]/div/input')))
+field_delete_space.send_keys(spacename_to_delete)
+button_delete_space_confirm = wait.until(EC.element_to_be_clickable((By.XPATH, '//button[contains(text(), "I understand the consequences, delete space permanently")]')) )
+button_delete_space_confirm.click()
+print(f"User succcessfuly deleted : {spacename_to_delete}")
+chrome_driver.close()
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 

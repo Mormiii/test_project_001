@@ -1,0 +1,49 @@
+Manual testcases for the UI testing of Knime Hub.
+
+1. Login
+
+Go to : https://hub.knime.com/
+Click on 'Login'
+On the Sign in page enter your username and password
+hit the 'Sign in' button
+The page 'Welcome to the KNIME Hub' appears
+On the top-right corner there is a circle -- click on it, following options appear:Profile, Spaces, Logout
+
+
+2.
+With a logged in user on this website: https://hub.knime.com/
+Click on the circle on the top-right corner
+from the options click on 'Spaces'
+'Your spaces' page appears
+
+3.
+With a logged in user on knime navigate to hub/spaces
+click on 'Public space' under 'Create new space'
+In the next page fill in the name of the public space
+Hit yellow tick, to save the name for the space
+when you go back to your spaces, you should see the new space that you've created
+
+
+4.
+With a logged in user on knime navigate to hub/spaces
+click on a space that you wish to delete
+In the next page you see the details of the choosen space
+hit the three dots on the bottom- right corner of the page
+click on 'Delete space' option
+a window pops up, to confirm your decision
+enter the name of the space you wish to delete
+hit button 'I understand the consequences, delete space permanently'
+The site redirects you to your spaces, you should not see the space that you've deleted
+
+5. UI verification
+
+With a logged in user on knime navigate to hub/spaces
+Validations:
+Look and feel of the page: - resize the window, page is responsive - passed
+'Your space' - should be the text - failed - make a defect report ( 'Your spaces' - 's' )
+'Create new space' block, not clickable, text is correct - passed
+'Public' and 'Private' spaces, clickable, 'Last edited***' text is visible and correct -passed
+    for Public spaces 3 icons appear, clickable -passed
+    for Private spaces 2 icons appear, clickable - failed - make a defect report ( there are 3 as well)
+    for each spaces listed, on the bottom-right corner there is a circle with the monogram of the user - passed
+    the icon symbolizing the private and public space are correct - passed

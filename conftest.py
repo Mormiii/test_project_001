@@ -1,8 +1,22 @@
 import requests as REST
 from json.decoder import JSONDecodeError
 import pytest
+from selenium import webdriver
+from selenium.webdriver.chrome.service import Service
+from selenium.webdriver.common.by import By
+from selenium import webdriver
+from selenium.webdriver.chrome.service import Service
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.common.exceptions import NoSuchElementException
+from selenium.webdriver.support.ui import WebDriverWait
+import time
+from selenium.common.exceptions import TimeoutException
 
-token = "eyJhbGciOiJSUzI1NiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICJ2SHpuYUhTS3RMWmszcnczVlJBN2M4eThsUHlVazU3YndMejRvekFZT1o4In0.eyJqdGkiOiI3OGJhYTlhZC0wODYzLTRiMzMtYTU5Yi01ZjljNDQxYjAwYjYiLCJleHAiOjE2NDY3MDQzMTcsIm5iZiI6MCwiaWF0IjoxNjQ2NjkzNTE3LCJpc3MiOiJodHRwczovL2F1dGguaHViLmtuaW1lLmNvbS9hdXRoL3JlYWxtcy9rbmltZSIsInN1YiI6IjBlY2UwMmY1LWFkZmItNDU3Yi1hMmFmLWJjOTNkYjc0NDdjMCIsInR5cCI6IkJlYXJlciIsImF6cCI6Imh1Yi11aSIsIm5vbmNlIjoiWGRoNHE0U3F0dXl6dmhMekxlUkJKYng5NTlSeUFraExBd0d5LU1Zc01OZyIsImF1dGhfdGltZSI6MTY0NjY0NDI0Mywic2Vzc2lvbl9zdGF0ZSI6Ijc3NmEwNTM0LWU0NjMtNGIwMS1iNDY2LWRkOGIxZDI2NTk0MCIsImFjciI6IjEiLCJhbGxvd2VkLW9yaWdpbnMiOlsiaHR0cHM6Ly9zdGFnZS5odWIua25pbWUuY29tIiwiaHR0cHM6Ly9odWIua25pbWUuY29tIl0sInJlc291cmNlX2FjY2VzcyI6eyJicm9rZXIiOnsicm9sZXMiOlsicmVhZC10b2tlbiJdfSwiYWNjb3VudCI6eyJyb2xlcyI6WyJtYW5hZ2UtYWNjb3VudCIsIm1hbmFnZS1hY2NvdW50LWxpbmtzIiwidmlldy1wcm9maWxlIl19fSwic2NvcGUiOiJvcGVuaWQgZ3JvdXBzIHJvbGVzIGVtYWlsIHByb2ZpbGUiLCJlbWFpbF92ZXJpZmllZCI6dHJ1ZSwibmFtZSI6IlRlc3RfS25pbWVfMDAxIiwiZ3JvdXBzIjpbImh1YnVzZXIiXSwicHJlZmVycmVkX3VzZXJuYW1lIjoidGVzdF9rbmltZV8wMDEiLCJnaXZlbl9uYW1lIjoiVGVzdF9LbmltZV8wMDEiLCJlbWFpbCI6ImRvci5kZWthbnlAZ21haWwuY29tIn0.P6UeDIxy3g0GTTQlZRELDzSv4WFsaRj4KtIpJt7Pf6FBqog2ftXRqJnci7pC-a1iPf0880Lk0hRkszvhBCUhLpvcf7vF_Y3sr5u6YhuSbSMd2cgIrjZ14fNbCas81_RqXKA_hOQO8i5sm4VE0lAEWkF_u4KzKnawrCZUamcDSG6cz8pKpIAQwAlwVMPcyC-bf78gXLOiPMKIvSvG3UG5sqgVsuKNiq3APvBFwqq_lAeS1SwdGgLQ2erYndJcC3SptDoogNd5eS-AP4U6FklnuX9e_LLv9GFBSOmEiFwBcD2zb7mOT3Uw7dWzbVO8qzg7RhMgjMwoIE8nruMkFALQ_g"
+
+token="eyJhbGciOiJSUzI1NiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICJ2SHpuYUhTS3RMWmszcnczVlJBN2M4eThsUHlVazU3YndMejRvekFZT1o4In0.eyJqdGkiOiI0MjVhMmI1Yi1iNTY2LTQ4NWQtODA0Yy00YzFkNTJjYTQ3NjEiLCJleHAiOjE2NDY4MzQ2MzQsIm5iZiI6MCwiaWF0IjoxNjQ2ODIzODM0LCJpc3MiOiJodHRwczovL2F1dGguaHViLmtuaW1lLmNvbS9hdXRoL3JlYWxtcy9rbmltZSIsInN1YiI6IjBlY2UwMmY1LWFkZmItNDU3Yi1hMmFmLWJjOTNkYjc0NDdjMCIsInR5cCI6IkJlYXJlciIsImF6cCI6Imh1Yi11aSIsIm5vbmNlIjoiWGRoNHE0U3F0dXl6dmhMekxlUkJKYng5NTlSeUFraExBd0d5LU1Zc01OZyIsImF1dGhfdGltZSI6MTY0NjY0NDI0Mywic2Vzc2lvbl9zdGF0ZSI6Ijc3NmEwNTM0LWU0NjMtNGIwMS1iNDY2LWRkOGIxZDI2NTk0MCIsImFjciI6IjEiLCJhbGxvd2VkLW9yaWdpbnMiOlsiaHR0cHM6Ly9zdGFnZS5odWIua25pbWUuY29tIiwiaHR0cHM6Ly9odWIua25pbWUuY29tIl0sInJlc291cmNlX2FjY2VzcyI6eyJicm9rZXIiOnsicm9sZXMiOlsicmVhZC10b2tlbiJdfSwiYWNjb3VudCI6eyJyb2xlcyI6WyJtYW5hZ2UtYWNjb3VudCIsIm1hbmFnZS1hY2NvdW50LWxpbmtzIiwidmlldy1wcm9maWxlIl19fSwic2NvcGUiOiJvcGVuaWQgZ3JvdXBzIHJvbGVzIGVtYWlsIHByb2ZpbGUiLCJlbWFpbF92ZXJpZmllZCI6dHJ1ZSwibmFtZSI6IlRlc3RfS25pbWVfMDAxIiwiZ3JvdXBzIjpbImh1YnVzZXIiXSwicHJlZmVycmVkX3VzZXJuYW1lIjoidGVzdF9rbmltZV8wMDEiLCJnaXZlbl9uYW1lIjoiVGVzdF9LbmltZV8wMDEiLCJlbWFpbCI6ImRvci5kZWthbnlAZ21haWwuY29tIn0.qXo6bM5L1nvltAM6QiCQ4OZPZpycF_W0ktHyjgtrub-DLH_NcumgA1efydvXWZIo-F-joh1GiIyWrZZfJ32hCTQlYlvT78c73XpJtqMbzkJMyEdx6E0p4zEAHB6RA0z1XIG4UtaJY-2K2NzhgRiMR4eHMswLPz037smiI1a0YTPs59FEesKvA2Tf1VU4uR5w6nRAjbZwoDgPsUCL4eNr2W-44-akXv_E0bhjTpAnHt7TGnfzp17N2NAs4a6W71mzx6ZiypxcDFpY2DHciNMW9YHfDqtVlSVswkSwKgy1FN1EKev-q89y7VuwPEkoxQxd9wNr1FRoKELY8ScbGr4Ixg"
+
+test_location = '/Users/mormika/Downloads/chromedriver'
+url_knime_login = 'https://www.knime.com/user/login?destination=/'
 
 # here pls give the User for the repository
 @pytest.fixture
@@ -11,12 +25,17 @@ def user():
 
 user_for_url= 'test_knime_001'
 
+#@pytest.fixture
+#def chrome_driver():
+#	return webdriver.Chrome(service=Service(test_location))
 
+
+chrome_driver= webdriver.Chrome(service=Service(test_location))
 
 def user_rep_space_names(user):
 	# user = 'test_knime_001'
 	url_user_repo = f'https://api.hub.knime.com/repository//Users/{user}'
-	#user_repo = f'/Users/{user}/'
+	print(url_user_repo)
 	params_space_details = {"spaceDetails": "true", "contribSpaces": "children"}
 	print(f"Information about this user: {user}'s repository")
 	#print("Sending a GET request to this url:", url_user_repo)
@@ -38,5 +57,18 @@ def user_rep_space_names(user):
 	for p in paths:
 		#space_names.append(p.lstrip(f"/Users/{user}/"))
 		space_names.append(p[22:])
-	#print(f"User has spaces with name: {space_names}")
+	print(f"User has spaces with name: {space_names}")
 	return space_names
+
+
+"""
+finding multiple elements and printing their attributes
+"""
+
+
+#button_multiple = chrome_driver.find_elements(By.TAG_NAME,'button')
+#print(f"Buttons found: {button_multiple}")
+#for i in button_multiple:
+#	print(i)
+#	attrs= chrome_driver.execute_script('var items = {}; for (index = 0; index < arguments[0].attributes.length; ++index) { items[arguments[0].attributes[index].name] = arguments[0].attributes[index].value }; return items;', i)
+#	print(attrs)

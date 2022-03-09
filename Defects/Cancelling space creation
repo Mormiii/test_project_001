@@ -1,0 +1,26 @@
+Defect ID: 1234
+Defect Title: Cancelling space creation fails
+Priority: High
+Severity:Major
+
+Expected behaviour:
+When user clicks on creating new public space, when cancelling space creation,
+the user is asked to confirm if they dont want to create the space,that being confirmed, we're navigated back to the user's spaces page.
+No new space was created.
+
+Current behaviour:
+When cancelling space creation, space still gets created and is visible under spaces.
+
+
+Steps to reproduce:
+1. Succesful login into Knime HUB: https://hub.knime.com/
+2. Navigate to Spaces under user's profile
+3. Click on create new public space
+4. Click on cancel on the page where you would name the new space
+5. Space is created and seen under spaces
+
+
+Date of the Defect being reported: 2022.03.08.
+Environment: Production
+Version of the application: Knime Server 4.1.0+git-6c1d3b2a.2021-12-02T15-37-57Z
+Reporter's name: Dóra Dékány
